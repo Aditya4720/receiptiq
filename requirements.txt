@@ -9,3 +9,4 @@ pytesseract==0.3.13
 setuptools
 httpx
 gunicorn
+groq
