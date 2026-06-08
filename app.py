@@ -32,16 +32,25 @@ ALLOWED_TYPES = [
 def get_db():
     return pymysql.connect(
         host=os.environ.get("DB_HOST", "localhost"),
-        user=os.environ.get("DB_USER", "root"),
+        port=int(os.environ.get("DB_PORT", 26251)),
+        user=os.environ.get("DB_USER", "avnadmin"),
         password=os.environ.get("DB_PASS", ""),
-        database=os.environ.get("DB_NAME", "receipt_scanner"),
-        cursorclass=pymysql.cursors.DictCursor
+        database=os.environ.get("DB_NAME", "defaultdb"),
+        cursorclass=pymysql.cursors.DictCursor,
+        ssl={"ca": os.environ.get("DB_SSL_CA", "")} if os.environ.get("DB_SSL_CA") else {"ssl": {}}
     )
 
 # ── Init DB ───────────────────────────────────────────
 def init_db():
     conn = get_db()
     with conn.cursor() as cursor:
+        cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
+)""")
         cursor.execute("""
 CREATE TABLE IF NOT EXISTS receipts (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -57,14 +66,6 @@ CREATE TABLE IF NOT EXISTS receipts (
     conn.commit()
     conn.close()
     print("✅ DB Ready")
-
-def reset_db():
-    conn = get_db()
-    with conn.cursor() as cursor:
-        cursor.execute("DELETE FROM receipts")
-    conn.commit()
-    conn.close()
-    print("🗑️ DB Cleared")
 
 init_db()
 
