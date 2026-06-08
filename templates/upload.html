@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Receipts – ReceiptIQ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --sky: #38bdf8;
+            --indigo: #6366f1;
+            --pink: #f472b6;
+            --green: #34d399;
+            --amber: #fbbf24;
+            --bg: #020617;
+            --surface: rgba(255,255,255,0.04);
+            --border: rgba(255,255,255,0.08);
+            --muted: rgba(255,255,255,0.45);
+        }
+
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* blobs */
+        .blob { position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.12; pointer-events: none; z-index: 0; }
+        .blob-1 { width: 500px; height: 500px; background: var(--indigo); top: -150px; left: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: var(--sky);    bottom: -100px; right: -80px; }
+        .blob-3 { width: 250px; height: 250px; background: var(--pink);   top: 50%; left: 40%; }
+
+        /* nav */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 48px;
+            backdrop-filter: blur(20px);
+            background: rgba(2,6,23,0.7);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-logo {
+            font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
+            background: linear-gradient(90deg, var(--sky), var(--indigo));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-decoration: none;
+        }
+        .nav-right { display: flex; gap: 10px; align-items: center; }
+        .nav-btn {
+            padding: 8px 18px; border-radius: 10px; text-decoration: none;
+            font-size: 13px; font-weight: 500; transition: all 0.2s;
+            border: 1px solid var(--border); color: var(--muted);
+            background: transparent;
+        }
+        .nav-btn:hover { color: #fff; background: var(--surface); }
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--sky), var(--indigo));
+            border-color: transparent; color: #fff;
+        }
+
+        /* layout */
+        .page {
+            position: relative; z-index: 1;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 480px;
+            gap: 0;
+            padding-top: 72px;
+        }
+
+        /* LEFT SIDE — info panel */
+        .left-panel {
+            padding: 60px 56px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .left-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 14px;
+            background: rgba(56,189,248,0.1);
+            border: 1px solid rgba(56,189,248,0.25);
+            border-radius: 100px;
+            font-size: 12px; font-weight: 500; color: var(--sky);
+            width: fit-content;
+        }
+        .left-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--sky); display: block; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        .left-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(32px, 3.5vw, 52px);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+        }
+        .left-title .grad {
+            background: linear-gradient(90deg, var(--sky), var(--indigo), var(--pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .left-sub {
+            font-size: 15px; color: var(--muted); line-height: 1.7; max-width: 420px;
+        }
+
+        /* feature pills */
+        .feat-list { display: flex; flex-direction: column; gap: 14px; }
+        .feat-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            transition: border-color 0.2s;
+        }
+        .feat-item:hover { border-color: rgba(255,255,255,0.15); }
+        .feat-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .feat-text strong { display: block; font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+        .feat-text span { font-size: 12px; color: var(--muted); }
+
+        /* stats row */
+        .stats-row { display: flex; gap: 20px; flex-wrap: wrap; }
+        .stat-pill {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-pill .num { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; }
+        .stat-pill .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+        /* RIGHT SIDE — upload form */
+        .right-panel {
+            background: rgba(255,255,255,0.02);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 48px 40px;
+            min-height: calc(100vh - 72px);
+        }
+
+        .form-title {
+            font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+            margin-bottom: 6px; letter-spacing: -0.3px;
+        }
+        .form-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+
+        /* drop zone */
+        .drop-zone {
+            border: 2px dashed rgba(56,189,248,0.35);
+            border-radius: 16px;
+            padding: 36px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            margin-bottom: 20px;
+            background: rgba(56,189,248,0.02);
+        }
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: var(--sky);
+            background: rgba(56,189,248,0.06);
+        }
+        .dz-icon { font-size: 36px; margin-bottom: 12px; display: block; transition: transform 0.2s; }
+        .drop-zone:hover .dz-icon { transform: scale(1.1); }
+        .dz-text { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+        .dz-hint { font-size: 12px; color: var(--muted); }
+
+        /* submit btn */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            border: none; border-radius: 13px;
+            background: linear-gradient(135deg, var(--sky), var(--indigo));
+            color: #fff; font-size: 15px; font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(56,189,248,0.2);
+            margin-bottom: 20px; /* Stats bar ke upar proper space dene ke liye */
+        }
+        .btn-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(99,102,241,0.4); }
+        .btn-submit:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
+
+        /* stats bar */
+        .stats-bar {
+            display: none;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+        .stats-bar-inner { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+        .sb-item { font-size: 12px; color: var(--muted); }
+        .sb-item strong { color: #fff; font-size: 13px; }
+
+        /* file list */
+        .file-list-wrap { display: none; margin-bottom: 20px; }
+        .file-list-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
+        .file-list {
+            max-height: 160px; overflow-y: auto;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+        }
+        .file-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 13px;
+        }
+        .file-item:last-child { border-bottom: none; }
+        .file-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 72%; }
+        .file-size { font-size: 11px; color: var(--sky); font-weight: 500; }
+
+        .btn-dash {
+            display: block; text-align: center;
+            padding: 12px;
+            border-radius: 13px;
+            text-decoration: none;
+            font-size: 14px; font-weight: 500;
+            color: var(--muted);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        .btn-dash:hover { color: #fff; background: var(--surface); }
+
+        /* loading overlay */
+        .loading-overlay {
+            position: fixed; inset: 0;
+            background: rgba(2,6,23,0.88);
+            backdrop-filter: blur(10px);
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .spinner {
+            width: 48px; height: 48px;
+            border: 3px solid rgba(56,189,248,0.15);
+            border-left-color: var(--sky);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .load-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+        .load-sub { font-size: 13px; color: var(--muted); }
+
+        /* responsive */
+        @media (max-width: 900px) {
+            .page { grid-template-columns: 1fr; }
+            .left-panel { padding: 40px 24px 20px; }
+            .right-panel { border-left: none; border-top: 1px solid var(--border); padding: 32px 24px; }
+        }
+        @media (max-width: 600px) {
+            nav { padding: 16px 20px; }
+            .nav-right .nav-btn:not(.active) { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <nav>
+        <a href="/" class="nav-logo">ReceiptIQ</a>
+        <div class="nav-right">
+            <a href="/upload" class="nav-btn active">Upload</a>
+            <a href="/dashboard" class="nav-btn">Dashboard</a>
+            <a href="/logout" class="nav-btn">Logout</a>
+        </div>
+    </nav>
+
+    <div class="page">
+
+        <!-- LEFT: Info Panel -->
+        <div class="left-panel">
+
+            <div>
+                <div class="left-badge"><span></span> Intelligent Document Processing</div>
+            </div>
+
+            <div>
+                <h1 class="left-title">
+                    Drop your bills.<br>
+                    <span class="grad">AI does the rest.</span>
+                </h1>
+                <p class="left-sub" style="margin-top: 16px;">
+                  Drop images or PDFs to trigger real-time AI extraction.
+                  Capture vendor details, transaction timestamps, categories, and taxes in milliseconds.
+                  No Manual Entry needed.
+                </p>
+            </div>
+
+            <div class="feat-list">
+                <div class="feat-item">
+                    <div class="feat-icon" style="background: rgba(56,189,248,0.12);">🧠</div>
+                    <div class="feat-text">
+                        <strong>Smart Extraction</strong>
+                        <span>Vendor · Amount · Tax · Category · Payment method</span>
+                    </div>
+                </div>
+                <div class="feat-item">
+                    <div class="feat-icon" style="background: rgba(99,102,241,0.12);">⚡</div>
+                    <div class="feat-text">
+                        <strong>Bulk Processing</strong>
+                        <span>Upload 50+ receipts at once with async parallel scanning</span>
+                    </div>
+                </div>
+                <div class="feat-item">
+                    <div class="feat-icon" style="background: rgba(52,211,153,0.12);">🔄</div>
+                    <div class="feat-text">
+                        <strong>Auto Deduplication</strong>
+                        <span>MD5 hashing — same receipt never saved twice</span>
+                    </div>
+                </div>
+                <div class="feat-item">
+                    <div class="feat-icon" style="background: rgba(244,114,182,0.12);">📄</div>
+                    <div class="feat-text">
+                        <strong>PDF + Image Support</strong>
+                        <span>JPG · PNG · WEBP · HEIC · PDF — all formats accepted</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-pill">
+                    <div class="num" style="color: var(--sky);">10+</div>
+                    <div class="lbl">Categories</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="num" style="color: var(--indigo);">50+</div>
+                    <div class="lbl">Bulk Upload</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="num" style="color: var(--green);">99%</div>
+                    <div class="lbl">Accuracy</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="num" style="color: var(--pink);">~0.5s</div>
+                    <div class="lbl">Per Receipt</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT: Upload Form (Reordered Hierarchy) -->
+        <div class="right-panel">
+            <div class="form-title">Upload Receipts</div>
+            <div class="form-sub">Select images or PDFs to scan with AI</div>
+
+            <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+
+                <!-- 1. Drop Zone -->
+                <div class="drop-zone" id="dropZone">
+                    <span class="dz-icon">📂</span>
+                    <div class="dz-text" id="dzText">Click to select or drag & drop</div>
+                    <div class="dz-hint">JPG · PNG · PDF · WEBP · HEIC &nbsp;|&nbsp; Min 5KB</div>
+                    <input type="file" name="files" id="fileInput" multiple
+                        accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf"
+                        style="display:none;">
+                </div>
+
+                <!-- 2. Submit Button (Moved up right below Drop Zone) -->
+                <button type="submit" class="btn-submit" id="submitBtn" disabled>
+                    ⚡ Analyze Receipts
+                </button>
+
+                <!-- 3. Stats Bar -->
+                <div class="stats-bar" id="statsBar">
+                    <div class="stats-bar-inner">
+                        <span class="sb-item">📁 Total: <strong id="totalCount">0</strong></span>
+                        <span class="sb-item" style="color:#34d399;">🖼️ Images: <strong id="imgCount">0</strong></span>
+                        <span class="sb-item" style="color:#f472b6;">📄 PDFs: <strong id="pdfCount">0</strong></span>
+                        <span class="sb-item" style="color:#fb923c;">❌ Skipped: <strong id="skipCount">0</strong></span>
+                    </div>
+                </div>
+
+                <!-- 4. Selected File List -->
+                <div class="file-list-wrap" id="fileListWrap">
+                    <div class="file-list-title">Selected files</div>
+                    <div class="file-list" id="fileList"></div>
+                </div>
+
+                <!-- 5. Back Button -->
+                <a href="/dashboard" class="btn-dash">← Back to Dashboard</a>
+
+            </form>
+        </div>
+
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="load-title">Scanning receipts...</div>
+        <div class="load-sub">AI vision is extracting data — please wait</div>
+    </div>
+
+    <script>
+        const dropZone   = document.getElementById('dropZone');
+        const fileInput  = document.getElementById('fileInput');
+        const submitBtn  = document.getElementById('submitBtn');
+        const uploadForm = document.getElementById('uploadForm');
+        const loading    = document.getElementById('loadingOverlay');
+        const fileList   = document.getElementById('fileList');
+        const fileListWrap = document.getElementById('fileListWrap');
+        const statsBar   = document.getElementById('statsBar');
+        const dzText     = document.getElementById('dzText');
+
+        const IMAGE_TYPES = ["image/jpeg","image/png","image/webp","image/heic","image/heif"];
+        const PDF_TYPE    = "application/pdf";
+        const MIN_SIZE    = 5 * 1024;
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        ['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, ev => {
+            ev.preventDefault(); dropZone.classList.add('drag-over');
+        }));
+        ['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => {
+            ev.preventDefault(); dropZone.classList.remove('drag-over');
+        }));
+        dropZone.addEventListener('drop', e => {
+            fileInput.files = e.dataTransfer.files;
+            updatePreview(e.dataTransfer.files);
+        });
+        fileInput.addEventListener('change', e => updatePreview(e.target.files));
+
+        function formatBytes(b) {
+            if (b < 1024) return b + ' B';
+            if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+            return (b/1048576).toFixed(1) + ' MB';
+        }
+
+        function updatePreview(files) {
+            const all = Array.from(files);
+            let imgs = 0, pdfs = 0, skipped = 0;
+            fileList.innerHTML = '';
+
+            all.forEach(f => {
+                const isImg = IMAGE_TYPES.includes(f.type);
+                const isPdf = f.type === PDF_TYPE;
+                const ok    = f.size >= MIN_SIZE && (isImg || isPdf);
+                if (!ok) { skipped++; return; }
+                if (isImg) imgs++; else pdfs++;
+
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                div.innerHTML = `<span class="file-name">${isImg ? '🖼️' : '📄'} ${f.name}</span><span class="file-size">${formatBytes(f.size)}</span>`;
+                fileList.appendChild(div);
+            });
+
+            const valid = imgs + pdfs;
+            document.getElementById('totalCount').textContent = all.length;
+            document.getElementById('imgCount').textContent   = imgs;
+            document.getElementById('pdfCount').textContent   = pdfs;
+            document.getElementById('skipCount').textContent  = skipped;
+
+            statsBar.style.display     = valid > 0 ? 'block' : 'none';
+            fileListWrap.style.display = valid > 0 ? 'block' : 'none';
+            submitBtn.disabled         = valid === 0;
+            dzText.textContent         = valid > 0 ? `✅ ${valid} file(s) ready` : 'Click to select or drag & drop';
+        }
+
+        uploadForm.addEventListener('submit', () => {
+            loading.style.display = 'flex';
+        });
+    </script>
+
+</body>
+</html>

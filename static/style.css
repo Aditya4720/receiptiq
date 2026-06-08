@@ -1,0 +1,577 @@
+```css id="r7jjg0"
+/* ---------------- GLOBAL ---------------- */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #020617, #0f172a);
+    color: #fff;
+    min-height: 100vh;
+}
+
+/* ---------------- CONTAINER ---------------- */
+
+.container {
+    width: 92%;
+    max-width: 1200px;
+    margin: auto;
+    padding: 40px 20px;
+}
+
+/* ---------------- HEADER ---------------- */
+
+h1 {
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 30px;
+
+    background: linear-gradient(90deg, #38bdf8, #6366f1);
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    background-clip: text;
+}
+
+/* ---------------- BUTTON ---------------- */
+
+button {
+
+    padding: 14px 25px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: linear-gradient(135deg, #38bdf8, #6366f1);
+
+    color: white;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+    box-shadow: 0 4px 20px rgba(56, 189, 248, 0.35);
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 15px;
+
+    width: 100%;
+
+    margin-top: 16px;
+}
+
+button:hover {
+
+    transform: scale(1.02);
+
+    box-shadow: 0 6px 28px rgba(99, 102, 241, 0.55);
+}
+
+button:disabled {
+
+    opacity: 0.55;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+/* ---------------- CARD ---------------- */
+
+.card {
+
+    background: rgba(255, 255, 255, 0.04);
+
+    border-radius: 16px;
+
+    padding: 20px;
+
+    backdrop-filter: blur(20px);
+
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+
+    border: 1px solid rgba(255,255,255,0.07);
+}
+
+/* ---------------- UPLOAD CARD ---------------- */
+
+.upload-card {
+
+    max-width: 520px;
+
+    margin: 0 auto;
+
+    text-align: center;
+}
+
+.upload-desc {
+
+    color: rgba(255,255,255,0.5);
+
+    margin-bottom: 24px;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+/* ---------------- FILE LABEL ---------------- */
+
+.file-label {
+
+    display: block;
+
+    padding: 28px 20px;
+
+    background: rgba(255,255,255,0.04);
+
+    border-radius: 14px;
+
+    border: 2px dashed rgba(56,189,248,0.6);
+
+    cursor: pointer;
+
+    transition: 0.3s;
+
+    margin-bottom: 4px;
+}
+
+.file-label:hover {
+
+    background: rgba(56,189,248,0.08);
+
+    border-color: #6366f1;
+}
+
+.file-icon {
+
+    font-size: 32px;
+
+    margin-bottom: 10px;
+}
+
+.file-label > div:not(.file-icon) {
+
+    color: rgba(255,255,255,0.8);
+
+    font-size: 14px;
+
+    margin-bottom: 4px;
+}
+
+.file-hint {
+
+    color: rgba(255,255,255,0.35) !important;
+
+    font-size: 12px !important;
+}
+
+.file-label input[type="file"] {
+
+    display: none;
+}
+
+/* ---------------- IMAGE PREVIEW ---------------- */
+
+.preview-list {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin: 14px 0 4px;
+
+    justify-content: center;
+}
+
+.preview-item {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 5px;
+
+    width: 90px;
+}
+
+.preview-item img {
+
+    width: 80px;
+
+    height: 80px;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+
+    border: 1px solid rgba(56,189,248,0.4);
+}
+
+.preview-item span {
+
+    font-size: 10px;
+
+    color: rgba(255,255,255,0.4);
+
+    text-align: center;
+
+    word-break: break-all;
+}
+
+/* ---------------- KPI CARDS ---------------- */
+
+.kpi {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+
+    gap: 18px;
+
+    margin-bottom: 28px;
+}
+
+.kpi div {
+
+    padding: 22px 18px;
+
+    border-radius: 16px;
+
+    background: rgba(255,255,255,0.05);
+
+    backdrop-filter: blur(15px);
+
+    text-align: center;
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    transition: 0.3s;
+}
+
+.kpi div:hover {
+
+    transform: translateY(-4px);
+
+    box-shadow: 0 10px 36px rgba(56,189,248,0.25);
+}
+
+.kpi-label {
+
+    font-size: 12px !important;
+
+    font-weight: 400 !important;
+
+    color: rgba(255,255,255,0.45) !important;
+
+    margin-bottom: 6px;
+
+    display: block;
+}
+
+/* ---------------- CHARTS ---------------- */
+
+.charts {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 22px;
+
+    margin-top: 28px;
+}
+
+.chart-card {
+
+    padding: 18px 18px 14px;
+}
+
+.chart-title {
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    color: rgba(255,255,255,0.7);
+
+    margin-bottom: 14px;
+
+    text-align: center;
+}
+
+.chart-wrap {
+
+    position: relative;
+
+    height: 240px;
+
+    width: 100%;
+}
+
+canvas {
+
+    display: block;
+}
+
+/* ---------------- ACTION BUTTONS ---------------- */
+
+.bottom-actions {
+
+    position: sticky;
+
+    top: 10px;
+
+    z-index: 100;
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 18px;
+
+    margin: 35px 0;
+
+    padding: 14px 0;
+
+    backdrop-filter: blur(8px);
+}
+
+.action-btn {
+
+    padding: 12px 22px;
+
+    border-radius: 12px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition: 0.3s;
+
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.upload-btn {
+
+    background: rgba(56,189,248,0.12);
+
+    color: #38bdf8;
+}
+
+.upload-btn:hover {
+
+    background: rgba(56,189,248,0.22);
+
+    transform: translateY(-2px);
+}
+
+.clear-btn {
+
+    background: rgba(244,114,182,0.12);
+
+    color: #f472b6;
+}
+
+.clear-btn:hover {
+
+    background: rgba(244,114,182,0.22);
+
+    transform: translateY(-2px);
+}
+
+/* ---------------- TABLE ---------------- */
+
+table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    border-radius: 14px;
+
+    overflow: hidden;
+}
+
+th {
+
+    background: linear-gradient(90deg, #1e40af, #4f46e5);
+
+    padding: 13px 14px;
+
+    text-align: left;
+
+    font-size: 13px;
+
+    letter-spacing: 0.3px;
+}
+
+td {
+
+    padding: 12px 14px;
+
+    background: rgba(255,255,255,0.02);
+
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+
+    font-size: 13px;
+}
+
+tr:hover td {
+
+    background: rgba(56,189,248,0.06);
+}
+
+/* ---------------- BADGES ---------------- */
+
+.badge {
+
+    display: inline-block;
+
+    padding: 3px 11px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    background: rgba(255,255,255,0.08);
+
+    color: rgba(255,255,255,0.6);
+}
+
+.badge-food {
+    background: rgba(251,146,60,0.18);
+    color: #fb923c;
+}
+
+.badge-grocery {
+    background: rgba(52,211,153,0.18);
+    color: #34d399;
+}
+
+.badge-dairy {
+    background: rgba(56,189,248,0.18);
+    color: #38bdf8;
+}
+
+.badge-clothing {
+    background: rgba(244,114,182,0.18);
+    color: #f472b6;
+}
+
+.badge-electronics {
+    background: rgba(99,102,241,0.18);
+    color: #818cf8;
+}
+
+.badge-travel {
+    background: rgba(167,139,250,0.18);
+    color: #a78bfa;
+}
+
+.badge-shopping {
+    background: rgba(251,191,36,0.18);
+    color: #fbbf24;
+}
+
+.badge-unknown {
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.35);
+}
+
+/* ---------------- LOADER ---------------- */
+
+.loader {
+
+    border: 4px solid rgba(255,255,255,0.08);
+
+    border-top: 4px solid #38bdf8;
+
+    border-radius: 50%;
+
+    width: 44px;
+
+    height: 44px;
+
+    animation: spin 0.85s linear infinite;
+
+    margin: 0 auto;
+}
+
+@keyframes spin {
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ---------------- SCROLLBAR ---------------- */
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #38bdf8;
+    border-radius: 10px;
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+
+@media (max-width: 768px) {
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .kpi {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .charts {
+        grid-template-columns: 1fr;
+    }
+
+    th,
+    td {
+        padding: 10px 9px;
+        font-size: 12px;
+    }
+
+    .chart-wrap {
+        height: 200px;
+    }
+
+    .bottom-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .kpi {
+        grid-template-columns: 1fr;
+    }
+}

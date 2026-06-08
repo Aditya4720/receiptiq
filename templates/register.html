@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register – ReceiptIQ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --sky: #38bdf8;
+            --indigo: #6366f1;
+            --pink: #f472b6;
+            --green: #34d399;
+            --bg: #020617;
+            --surface: rgba(255,255,255,0.04);
+            --border: rgba(255,255,255,0.08);
+            --muted: rgba(255,255,255,0.45);
+        }
+
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 70% 20%, rgba(56,189,248,0.1) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 30% 80%, rgba(244,114,182,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .auth-wrap {
+            width: 100%;
+            max-width: 440px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-logo {
+            display: block;
+            text-align: center;
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--sky), var(--indigo));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            margin-bottom: 32px;
+        }
+
+        .auth-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px 36px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+        }
+
+        .auth-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        .auth-sub {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+
+        .auth-error {
+            background: rgba(244,114,182,0.1);
+            border: 1px solid rgba(244,114,182,0.25);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--pink);
+            margin-bottom: 24px;
+        }
+
+        .field { margin-bottom: 18px; }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 13px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            font-family: 'DM Sans', sans-serif;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        input::placeholder { color: rgba(255,255,255,0.2); }
+
+        input:focus {
+            border-color: rgba(56,189,248,0.5);
+            background: rgba(56,189,248,0.05);
+        }
+
+        /* Password strength indicator */
+        .strength-bar {
+            height: 3px;
+            border-radius: 100px;
+            background: var(--border);
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            border-radius: 100px;
+            width: 0%;
+            transition: width 0.3s, background 0.3s;
+        }
+
+        .strength-text {
+            font-size: 11px;
+            margin-top: 5px;
+            color: var(--muted);
+            min-height: 14px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 13px;
+            background: linear-gradient(135deg, var(--sky), var(--indigo));
+            color: #fff;
+            font-size: 15px;
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(56,189,248,0.2);
+            margin-top: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 28px rgba(99,102,241,0.4);
+        }
+
+        .btn-submit:active { transform: scale(0.98); }
+
+        /* Perks list */
+        .perks {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 28px;
+            padding: 16px;
+            background: rgba(52,211,153,0.05);
+            border: 1px solid rgba(52,211,153,0.12);
+            border-radius: 12px;
+        }
+
+        .perk {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .perk-dot {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: rgba(52,211,153,0.15);
+            border: 1px solid rgba(52,211,153,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            color: var(--green);
+            flex-shrink: 0;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .auth-footer a {
+            color: var(--sky);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-footer a:hover { color: #fff; }
+
+        .back-home {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .back-home:hover { color: #fff; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-wrap">
+
+        <a href="/" class="auth-logo">ReceiptIQ</a>
+
+        <div class="auth-card">
+            <h1 class="auth-title">Create account</h1>
+            <p class="auth-sub">Free forever. No credit card required.</p>
+
+            <div class="perks">
+                <div class="perk"><div class="perk-dot">✓</div> AI receipt scanning</div>
+                <div class="perk"><div class="perk-dot">✓</div> Private data — only you see your receipts</div>
+                <div class="perk"><div class="perk-dot">✓</div> Bulk upload up to 50 receipts at once</div>
+            </div>
+
+            {% if error %}
+            <div class="auth-error">⚠ {{ error }}</div>
+            {% endif %}
+
+            <form method="POST">
+                <div class="field">
+                    <label for="name">Full name</label>
+                    <input type="text" name="name" id="name" placeholder="John Doe" required autocomplete="name">
+                </div>
+
+                <div class="field">
+                    <label for="email">Email address</label>
+                    <input type="email" name="email" id="email" placeholder="you@example.com" required autocomplete="email">
+                </div>
+
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" placeholder="Min. 8 characters" required autocomplete="new-password">
+                    <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                    <div class="strength-text" id="strengthText"></div>
+                </div>
+
+                <button type="submit" class="btn-submit">Create account →</button>
+            </form>
+
+            <div class="auth-footer">
+                Already have an account? <a href="/login">Sign in</a>
+            </div>
+        </div>
+
+        <a href="/" class="back-home">← Back to home</a>
+    </div>
+
+    <script>
+        const pwInput      = document.getElementById('password');
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+
+        const levels = [
+            { min: 0,  max: 3,  pct: '20%',  bg: '#f472b6', label: 'Too short' },
+            { min: 4,  max: 5,  pct: '40%',  bg: '#fb923c', label: 'Weak' },
+            { min: 6,  max: 7,  pct: '65%',  bg: '#fbbf24', label: 'Fair' },
+            { min: 8,  max: 11, pct: '85%',  bg: '#38bdf8', label: 'Good' },
+            { min: 12, max: 99, pct: '100%', bg: '#34d399', label: 'Strong ✓' },
+        ];
+
+        pwInput.addEventListener('input', () => {
+            const len = pwInput.value.length;
+            if (!len) {
+                strengthFill.style.width = '0';
+                strengthText.textContent = '';
+                return;
+            }
+            const lvl = levels.find(l => len >= l.min && len <= l.max) || levels[levels.length - 1];
+            strengthFill.style.width      = lvl.pct;
+            strengthFill.style.background = lvl.bg;
+            strengthText.textContent      = lvl.label;
+            strengthText.style.color      = lvl.bg;
+        });
+    </script>
+
+</body>
+</html>

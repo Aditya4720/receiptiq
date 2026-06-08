@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard – Receipt Scanner Architecture</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <style>
+        /* Extra Component Specifications Layer for Premium Analytics UI */
+        body {
+            background: linear-gradient(135deg, #020617, #0f172a);
+            color: #fff;
+            min-height: 100vh;
+            font-family: "Poppins", sans-serif;
+        }
+
+        .dashboard-wrapper {
+            animation: fadeIn 0.6s ease-in-out;
+            width: 92%;
+            max-width: 1400px;
+            margin: auto;
+            padding: 40px 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-action-zone {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 24px;
+        }
+
+        .user-welcome-node {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: clamp(24px, 4vw, 36px);
+            background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.6));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .action-button-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-premium-nav {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* NEW: Back Button Professional Styling */
+        .btn-back-nav {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-back-nav:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-scan-primary {
+            background: linear-gradient(135deg, #38bdf8, #6366f1);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-scan-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-clear-danger {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        .btn-clear-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-logout-sec {
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255,255,255,0.7);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .btn-logout-sec:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .btn-export {
+            background: rgba(52,211,153,0.12);
+            color: #34d399;
+            border: 1px solid rgba(52,211,153,0.25);
+        }
+
+        .btn-export:hover {
+            background: rgba(52,211,153,0.22);
+            transform: translateY(-1px);
+        }
+
+        /* KPI Matrix System Specifications */
+        .kpi {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .kpi > div {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            transition: border-color 0.3s ease;
+        }
+
+        .kpi > div:hover {
+            border-color: rgba(255,255,255,0.12);
+        }
+
+        .kpi-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.75px;
+            font-weight: 600;
+        }
+
+        .kpi-value-field {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* Charts Section Layout Matrix */
+        .charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
+            gap: 28px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 28px;
+        }
+
+        .chart-card h3 {
+            font-size: 15px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+            width: 100%;
+        }
+
+        /* Table Data Ledger Subsystem Rules */
+        .table-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 0;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .table-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.01);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.75px;
+            padding: 18px 28px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        td {
+            padding: 18px 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: rgba(255,255,255,0.8);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.015);
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+            letter-spacing: 0.2px;
+        }
+
+        .push-right {
+        margin-left: auto;
+    }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .charts {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-action-zone {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 24px;
+            }
+            .action-button-group {
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+            .btn-premium-nav {
+                flex: 1;
+                min-width: 140px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-wrapper">
+
+<div class="header-action-zone">
+    <a href="/" style="text-decoration: none; cursor: pointer;">
+        <div class="user-welcome-node">
+            📊 Expense Intelligence Summary
+        </div>
+    </a>
+
+    <div style="display:flex; align-items:center; width:100%;">
+
+        <div class="action-button-group">
+            <a href="/upload" class="btn-premium-nav btn-back-nav">
+                <span>⬅</span> Back
+            </a>
+
+            <a href="#" class="btn-premium-nav btn-scan-primary"
+               onclick="triggerDashboardPicker(); return false;">
+                <span>➕</span> Upload More
+            </a>
+
+            <a href="/clear" class="btn-premium-nav btn-clear-danger"
+               onclick="return confirm('Do you really want to delete all data?');">
+                <span>🗑️</span> Clear All
+            </a>    
+            <a href="/export" class="btn-premium-nav btn-export">
+                <span>📥</span> Export Excel
+            </a>
+        </div>
+
+        <!-- Right Side Button -->
+        <a href="#" class="btn-premium-nav btn-history-warning push-right"
+           onclick="openHistoryModal(); return false;"
+           style="background: rgba(251,191,36,0.1);
+                  color: #fbbf24;
+                  border: 1px solid rgba(251,191,36,0.25);
+                  text-decoration: none;">
+            <span>🕓</span> Download History
+        </a>
+
+    </div>
+
+</div>
+<!-- ── DOWNLOAD HISTORY MODAL ── -->
+<div id="historyModal" style="display:none; position:fixed; inset:0; z-index:9999;
+     background:rgba(2,6,23,0.85); backdrop-filter:blur(10px);
+     align-items:center; justify-content:center;">
+    <div style="background:#0f172a; border:1px solid rgba(255,255,255,0.1);
+         border-radius:20px; width:90%; max-width:700px; max-height:80vh;
+         overflow:hidden; display:flex; flex-direction:column;
+         box-shadow:0 25px 60px rgba(0,0,0,0.6);">
+
+        <!-- Modal Header -->
+        <div style="padding:24px 28px; border-bottom:1px solid rgba(255,255,255,0.07);
+             display:flex; justify-content:space-between; align-items:center;">
+            <div>
+                <div style="font-family:'Syne',sans-serif; font-size:20px; font-weight:800; letter-spacing:-0.3px;">
+                    🕓 Download History
+                </div>
+                <div style="font-size:12px; color:rgba(255,255,255,0.4); margin-top:4px;">
+                    Last 10 exports from your account
+                </div>
+            </div>
+            <button onclick="closeHistoryModal()"
+                style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+                color:rgba(255,255,255,0.6); border-radius:10px; padding:8px 16px;
+                cursor:pointer; font-size:14px; width:auto; margin-top:0; font-family:'Poppins',sans-serif;">
+                ✕ Close
+            </button>
+        </div>
+
+        <!-- Modal Table -->
+        <div style="overflow-y:auto; padding:0;">
+            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                <thead>
+                    <tr>
+                        <th style="padding:14px 24px; text-align:left; font-size:11px; color:rgba(255,255,255,0.4);
+                            text-transform:uppercase; letter-spacing:0.75px; font-weight:600;
+                            border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02);">#</th>
+                        <th style="padding:14px 24px; text-align:left; font-size:11px; color:rgba(255,255,255,0.4);
+                            text-transform:uppercase; letter-spacing:0.75px; font-weight:600;
+                            border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02);">File Name</th>
+                        <th style="padding:14px 24px; text-align:left; font-size:11px; color:rgba(255,255,255,0.4);
+                            text-transform:uppercase; letter-spacing:0.75px; font-weight:600;
+                            border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02);">Records</th>
+                        <th style="padding:14px 24px; text-align:left; font-size:11px; color:rgba(255,255,255,0.4);
+                            text-transform:uppercase; letter-spacing:0.75px; font-weight:600;
+                            border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02);">Downloaded At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in export_logs %}
+                    <tr>
+                        <td style="padding:14px 24px; border-bottom:1px solid rgba(255,255,255,0.04);
+                            color:rgba(255,255,255,0.35);">{{ loop.index }}</td>
+                        <td style="padding:14px 24px; border-bottom:1px solid rgba(255,255,255,0.04);
+                            color:#38bdf8; font-weight:500;">📄 {{ log.filename }}</td>
+                        <td style="padding:14px 24px; border-bottom:1px solid rgba(255,255,255,0.04);
+                            color:#34d399; font-weight:600;">{{ log.total_records }} receipts</td>
+                        <td style="padding:14px 24px; border-bottom:1px solid rgba(255,255,255,0.04);
+                            color:rgba(255,255,255,0.5);">
+                            {{ log.downloaded_at.strftime('%d %b %Y, %I:%M %p') if log.downloaded_at else '—' }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="padding:48px 24px; text-align:center;
+                            color:rgba(255,255,255,0.25); font-size:14px;">
+                            No exports yet. Click "Export Excel" to download your receipts.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Modal Footer -->
+        <div style="padding:16px 28px; border-top:1px solid rgba(255,255,255,0.07);
+             display:flex; justify-content:flex-end;">
+            <a href="/export" style="background:linear-gradient(135deg,#38bdf8,#6366f1);
+               color:#fff; padding:10px 24px; border-radius:10px; text-decoration:none;
+               font-size:14px; font-weight:500;">
+                📥 Download Now
+            </a>
+        </div>
+    </div>
+</div>
+
+<form id="appendForm" action="/upload?mode=append" method="POST" enctype="multipart/form-data" style="display: none; visibility: hidden; height: 0; width: 0; margin: 0; padding: 0;">
+    <input type="file" id="dashboardFilePicker" name="files" multiple onchange="submitAppendForm()">
+</form>
+
+    <div class="kpi">
+        <div>
+            <div class="kpi-label">Aggregated Expenses</div>
+            <div class="kpi-value-field" style="color: #fff;">₹{{ "%.2f"|format(total) }}</div>
+        </div>
+
+        <div>
+            <div class="kpi-label">Documents Processed</div>
+            <div class="kpi-value-field" style="color: #38bdf8;">{{ count }}</div>
+        </div>
+
+        <div>
+            <div class="kpi-label">Average Cost / Transaction</div>
+            <div class="kpi-value-field" style="color: #a78bfa;">₹{{ "%.2f"|format(avg) }}</div>
+        </div>
+
+        <div>
+            <div class="kpi-label">Total Imposed Tax</div>
+            <div class="kpi-value-field" style="color: #f472b6;">₹{{ "%.2f"|format(tax_total) }}</div>
+        </div>
+    </div>
+
+    <div class="charts">
+        <div class="card chart-card">
+            <h3>🏷️ Sales Allocation by Category</h3>
+            <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h3>📉 Imposed Tax Volume by Category (₹)</h3>
+            <div class="chart-container">
+                <canvas id="taxChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h3>💳 Sales by Payment Method</h3>
+            <div class="chart-container">
+                <canvas id="paymentChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h3>💰 Sales by Price Ranges</h3>
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="card table-card">
+        <div class="table-header">
+            <h3 style="font-family: 'Syne', sans-serif; font-weight: 700; font-size: 18px; color: rgba(255,255,255,0.95); letter-spacing: -0.2px;">
+                📜 Authenticated Database File Records History Log
+            </h3>
+        </div>
+
+        <div style="overflow-x: auto; width: 100%;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Corporate Merchant/Vendor Name</th>
+                        <th>Transaction Timestamp</th>
+                        <th>Category</th>
+                        <th>Settlement Type</th>
+                        <th>Assessed Tax Component</th>
+                        <th>Gross Terminal Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        <td style="font-weight: 600; color: #fff; letter-spacing: -0.2px;">
+                            {{ row.vendor_name }}
+                        </td>
+                        <td style="color: rgba(255,255,255,0.65);">
+                            {{ row.date }}
+                        </td>
+                        <td>
+                            <span class="badge badge-{{ row.category }}">
+                                {{ row.category }}
+                            </span>
+                        </td>
+                        <td style="color: rgba(255,255,255,0.7); font-weight: 500;">
+                            {{ row.payment_method }}
+                        </td>
+                        <td style="color: rgba(255,255,255,0.5);">
+                            ₹{{ "%.2f"|format(row.tax_amount) }}
+                        </td>
+                        <td style="font-weight: 700; color: #34d399; font-size: 15px;">
+                            ₹{{ "%.2f"|format(row.total_amount) }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: rgba(255,255,255,0.3); padding: 60px 0; font-size: 14px;">
+                            ⚠️ Database holds zero parsed nodes. Access the main capture terminal to execute OCR Vision ingestion!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ── Modal open/close ──
+    function openHistoryModal() {
+        document.getElementById('historyModal').style.display = 'flex';
+    }
+    function closeHistoryModal() {
+        document.getElementById('historyModal').style.display = 'none';
+    }
+    document.getElementById('historyModal').addEventListener('click', function(e) {
+        if (e.target === this) closeHistoryModal();
+    });
+
+    function triggerDashboardPicker() {
+        const fileInput = document.getElementById('dashboardFilePicker');
+        if (fileInput) fileInput.click();
+    }
+
+    function submitAppendForm() {
+        const picker = document.getElementById('dashboardFilePicker');
+        const form = document.getElementById('appendForm');
+        if (picker && picker.files.length > 0 && form) form.submit();
+    }
+
+    const rows = [
+        {% for r in rows %}
+        {
+            category: "{{ r.category|escape }}",
+            payment_method: "{{ r.payment_method|escape }}",
+            total_amount: {{ r.total_amount or 0.0 }},
+            tax_amount: {{ r.tax_amount or 0.0 }}
+        },
+        {% endfor %}
+    ];
+
+    const COLORS = ["#38bdf8", "#6366f1", "#f472b6", "#34d399", "#fbbf24", "#a78bfa", "#f87171"];
+
+    const baseOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: { 
+                    color: "rgba(255,255,255,0.75)", 
+                    font: { family: 'Poppins', size: 12, weight: 500 },
+                    padding: 16
+                }
+            }
+        }
+    };
+
+    const axisOptions = {
+        ...baseOptions,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { ticks: { color: "rgba(255,255,255,0.5)", font: { family: 'Poppins' } }, grid: { display: false } },
+            y: { ticks: { color: "rgba(255,255,255,0.5)", font: { family: 'Poppins' } }, grid: { color: "rgba(255,255,255,0.04)" } }
+        }
+    };
+
+    function aggregate(key, valKey) {
+        const counts = {};
+        rows.forEach(r => {
+            const k = r[key] || "Unknown";
+            const amt = valKey ? r[valKey] : 1;
+            counts[k] = (counts[k] || 0) + amt;
+        });
+        return counts;
+    }
+
+    /* Charts Initializations */
+    (function() {
+        const map = aggregate("category", "total_amount");
+        const labels = Object.keys(map);
+        if (!labels.length) return;
+        new Chart(document.getElementById("categoryChart"), {
+            type: "bar",
+            data: {
+                labels,
+                datasets: [{ label: "Gross Expenditure (₹)", data: Object.values(map), backgroundColor: COLORS, borderRadius: 8, barThickness: 24 }]
+            },
+            options: axisOptions
+        });
+    })();
+
+    (function() {
+        const map = aggregate("category", "tax_amount");
+        const labels = Object.keys(map);
+        if (!labels.length) return;
+        new Chart(document.getElementById("taxChart"), {
+            type: "bar",
+            data: {
+                labels,
+                datasets: [{ label: "Tax Amount (₹)", data: Object.values(map), backgroundColor: labels.map((_, i) => COLORS[i % COLORS.length]), borderRadius: 8, barThickness: 20 }]
+            },
+            options: {
+                ...baseOptions,
+                indexAxis: "y",
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { beginAtZero: true, ticks: { color: "rgba(255,255,255,0.5)" }, grid: { color: "rgba(255,255,255,0.04)" } },
+                    y: { ticks: { color: "rgba(255,255,255,0.65)", font: { size: 12 } }, grid: { display: false } }
+                }
+            }
+        });
+    })();
+
+    (function() {
+        const map = aggregate("payment_method", null);
+        const labels = Object.keys(map);
+        if (!labels.length) return;
+        new Chart(document.getElementById("paymentChart"), {
+            type: "pie",
+            data: {
+                labels,
+                datasets: [{ data: Object.values(map), backgroundColor: COLORS, borderColor: "rgba(2, 6, 23, 0.8)" }]
+            },
+            options: baseOptions
+        });
+    })();
+
+    (function() {
+        const range = { "₹0–500 Micro": 0, "₹500–1000 Standard": 0, "₹1000–2000 Mid Tier": 0, "₹2000+ Enterprise": 0 };
+        rows.forEach(r => {
+            const amt = r.total_amount || 0;
+            if (amt <= 500) range["₹0–500 Micro"]++;
+            else if (amt <= 1000) range["₹500–1000 Standard"]++;
+            else if (amt <= 2000) range["₹1000–2000 Mid Tier"]++;
+            else range["₹2000+ Enterprise"]++;
+        });
+        new Chart(document.getElementById("priceChart"), {
+            type: "doughnut",
+            data: { labels: Object.keys(range), datasets: [{ data: Object.values(range), backgroundColor: ["#34d399", "#38bdf8", "#6366f1", "#f472b6"], borderColor: "rgba(2, 6, 23, 0.5)" }] },
+            options: { ...baseOptions, cutout: "65%" }
+        });
+    })();
+</script>
+
+</body>
+</html>
