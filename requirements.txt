@@ -8,5 +8,5 @@ opencv-python==4.12.0.88
 pytesseract==0.3.13
 setuptools
 httpx
-gunicorn
 groq
+pymupdf
